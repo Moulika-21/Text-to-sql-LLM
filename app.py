@@ -3,6 +3,7 @@ load_dotenv() #load the environment variables
 
 import streamlit as st
 import os
+import time
 import sqlite3
 import google.generativeai as genai
 
@@ -39,18 +40,25 @@ prompt=[
     """
 ]
 
-st.set_page_config(page_title="I can Retrieve any SQL query")
+st.set_page_config(page_title="SQL from Natural Language", page_icon="🧠")
 st.header("Gemini App To Retrieve SQL Data")
 
 question=st.text_input("Input: ",key="input")
 submit=st.button("Ask the question")
 
 if submit:
+    start = time.time()
     response=get_gemini_response(question,prompt)
     print(response)
+    st.success("✅ SQL Query Generated")
+    st.code(response, language='sql')
     data=read_sql_query(response,"student.db")
-    st.subheader("The Response is")
+    end = time.time()
+    st.toast("📊 Query executed and displayed") #like apopup
+    st.subheader("📊 Output")
     for row in data:
         print(row)
         st.header(row)
+    st.write(f"⏱ Query executed in `{end - start:.2f}` seconds")
+
 
